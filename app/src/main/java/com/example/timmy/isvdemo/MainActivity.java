@@ -64,6 +64,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TextView mShowMsgTextView;
     private  TextView  mShowRegFbkTextView;
     private final String TAG=MainActivity.class.getSimpleName();
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +94,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     }
 
+    //控件初始化
     private void initui() {
         ed_input= (EditText) findViewById(R.id.ed_input);
         register_btn= (Button) findViewById(R.id.register_btn);
@@ -114,62 +119,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
         AUTH_ID=ed_input.getText().toString();
     }
 
-    @Override
+    @Override //按钮监听事件
     public void onClick(View v) {
         switch (v.getId())
         {
             case R.id.getpassword:
                 reset();
-                // 获取密码之前先终止之前的注册或验证过程
-                mVerify.cancel();
-                mVerify.setParameter(SpeechConstant.PARAMS, null);
-                mVerify.setParameter(SpeechConstant.ISV_PWDT, "" + pwdType);
-                mVerify.getPasswordList(mPwdListenter);
+                getpassword();
                 break;
             case R.id.register_btn:
-                // 清空参数
-                mVerify.setParameter(SpeechConstant.PARAMS, null);
-                mVerify.setParameter(SpeechConstant.ISV_AUDIO_PATH,
-                        Environment.getExternalStorageDirectory().getAbsolutePath() + "/msc/test.pcm");
-                // 对于某些麦克风非常灵敏的机器，如nexus、samsung i9300等，建议加上以下设置对录音进行消噪处理
-//			mVerify.setParameter(SpeechConstant.AUDIO_SOURCE, "" + MediaRecorder.AudioSource.VOICE_RECOGNITION);
-                if (pwdType == PWD_TYPE_TEXT) {
-                    // 文本密码注册需要传入密码
-                    if (TextUtils.isEmpty(mTextPwd)) {
-                       showTip("请获取密码后进行操作");
-                        return;
-                    }
-                    mVerify.setParameter(SpeechConstant.ISV_PWD, mTextPwd);
-                    mShowPwdTextView.setText("请读出：" + mTextPwd);
-                    mShowMsgTextView.setText("训练 第" + 1 + "遍，剩余4遍");
-                } else if (pwdType == PWD_TYPE_NUM) {
-                    // 数字密码注册需要传入密码
-                    if (TextUtils.isEmpty(mNumPwd)) {
-                        showTip("请获取密码后进行操作");
-                        return;
-                    }
-                    mVerify.setParameter(SpeechConstant.ISV_PWD, mNumPwd);
-                    ((TextView) findViewById(R.id.showPwd)).setText("请读出："
-                            + mNumPwd.substring(0, 8));
-                    mShowMsgTextView.setText("训练 第" + 1 + "遍，剩余4遍");
-                }
-
-           //     setRadioClickable(false);
-                // 设置auth_id，不能设置为空
-                mVerify.setParameter(SpeechConstant.AUTH_ID, AUTH_ID);
-                // 设置业务类型为注册
-                mVerify.setParameter(SpeechConstant.ISV_SST, "train");
-                // 设置声纹密码类型
-                mVerify.setParameter(SpeechConstant.ISV_PWDT, "" + pwdType);
-                // 开始注册
-                mVerify.startListening(mRegisterListener);
+                register();
                 break;
-
             case R.id.check_btn:
                 checked();
                 break;
             case R.id.Delete_btn:
-                performModelOperation("del", mModelOperationListener);
+                delete();
                 break;
             default:
                 break;
@@ -177,6 +142,64 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     }
 
+    //删除模块函数
+    private void delete() {
+        performModelOperation("del", mModelOperationListener);
+    }
+
+
+    //注册模块函数
+    private void register() {
+        // 清空参数
+        mVerify.setParameter(SpeechConstant.PARAMS, null);
+        mVerify.setParameter(SpeechConstant.ISV_AUDIO_PATH,
+                Environment.getExternalStorageDirectory().getAbsolutePath() + "/msc/test.pcm");
+        // 对于某些麦克风非常灵敏的机器，如nexus、samsung i9300等，建议加上以下设置对录音进行消噪处理
+//			mVerify.setParameter(SpeechConstant.AUDIO_SOURCE, "" + MediaRecorder.AudioSource.VOICE_RECOGNITION);
+        if (pwdType == PWD_TYPE_TEXT) {
+            // 文本密码注册需要传入密码
+            if (TextUtils.isEmpty(mTextPwd)) {
+                showTip("请获取密码后进行操作");
+                return;
+            }
+            mVerify.setParameter(SpeechConstant.ISV_PWD, mTextPwd);
+            mShowPwdTextView.setText("请读出：" + mTextPwd);
+            mShowMsgTextView.setText("训练 第" + 1 + "遍，剩余4遍");
+        } else if (pwdType == PWD_TYPE_NUM) {
+            // 数字密码注册需要传入密码
+            if (TextUtils.isEmpty(mNumPwd)) {
+                showTip("请获取密码后进行操作");
+                return;
+            }
+            mVerify.setParameter(SpeechConstant.ISV_PWD, mNumPwd);
+            ((TextView) findViewById(R.id.showPwd)).setText("请读出："
+                    + mNumPwd.substring(0, 8));
+            mShowMsgTextView.setText("训练 第" + 1 + "遍，剩余4遍");
+        }
+
+        //     setRadioClickable(false);
+        // 设置auth_id，不能设置为空
+        mVerify.setParameter(SpeechConstant.AUTH_ID, AUTH_ID);
+        // 设置业务类型为注册
+        mVerify.setParameter(SpeechConstant.ISV_SST, "train");
+        // 设置声纹密码类型
+        mVerify.setParameter(SpeechConstant.ISV_PWDT, "" + pwdType);
+        // 开始注册
+        mVerify.startListening(mRegisterListener);
+    }
+
+    //获取密码模块函数
+    private void getpassword() {
+        // 获取密码之前先终止之前的注册或验证过程
+        mVerify.cancel();
+        mVerify.setParameter(SpeechConstant.PARAMS, null);
+        mVerify.setParameter(SpeechConstant.ISV_PWDT, "" + pwdType);
+        mVerify.getPasswordList(mPwdListenter);
+
+    }
+
+
+    //重置模块函数
     private void reset() {
         mTextPwd = null;
         mNumPwd = null;
@@ -187,6 +210,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
      //   mRecordTimeTextView.setText("");
     }
 
+    //验证模块函数
     private void checked() {
         // 清空提示信息
         ((TextView) findViewById(R.id.showMsg)).setText("");
@@ -223,6 +247,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // 开始验证
         mVerify.startListening(mVerifyListener);
     }
+
+
+    //将各个控件显示内容置空
+    private void initTextView() {
+        ed_input.setText("");
+
+    }
+
     private VerifierListener mVerifyListener = new VerifierListener() {
 
         @Override
@@ -307,9 +339,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
             showTip("开始说话");
         }
     };
-
-
-
 
     private void performModelOperation(String operation, SpeechListener listener) {
         // 清空参数
@@ -563,10 +592,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     };
 
-    private void initTextView() {
-        ed_input.setText("");
-
-    }
 
 
 
