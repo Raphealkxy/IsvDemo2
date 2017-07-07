@@ -10,7 +10,7 @@
 
     <EditText
         android:id="@+id/ed_input"
-        android:hint="请输入用户名"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <LinearLayout
@@ -45,7 +45,11 @@
             android:text="删除模型" />
 
     </LinearLayout>
-
+    <TextView
+        android:id="@+id/AuthIdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" />
     <TextView
         android:id="@+id/text_show"
         android:layout_width="match_parent"

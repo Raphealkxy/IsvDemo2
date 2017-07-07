@@ -63,6 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private  TextView mShowPwdTextView;
     private TextView mShowMsgTextView;
     private  TextView  mShowRegFbkTextView;
+    private  TextView mAuthIdTextView;
     private final String TAG=MainActivity.class.getSimpleName();
 
 
@@ -76,6 +77,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         initui();//初始化控件
+
+        // 将上个页面输入的用户名作为AuthId
+        AUTH_ID = getIntent().getStringExtra("uname");
+        mAuthIdTextView.setText(AUTH_ID);
         //初始化speakverfy
         mVerify = SpeakerVerifier.createVerifier(this, new InitListener() {
 
@@ -103,6 +108,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mShowPwdTextView= (TextView) findViewById(R.id.text_show);
         mShowMsgTextView=(TextView)findViewById(R.id.text_show1);
         mShowRegFbkTextView= (TextView) findViewById(R.id.showRegFbk);
+        mAuthIdTextView= (TextView) findViewById(R.id.AuthIdTextView);
         Delete_btn= (Button) findViewById(R.id.Delete_btn);
         register_btn.setOnClickListener(this);
         checked_btn.setOnClickListener(this);
@@ -113,10 +119,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mToast = Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT);
         mToast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
 
-        if(ed_input.getText().toString()==null)
-              showTip("用户名不能为空");
-        else
-        AUTH_ID=ed_input.getText().toString();
+
     }
 
     @Override //按钮监听事件
@@ -151,6 +154,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     //注册模块函数
     private void register() {
         // 清空参数
+
         mVerify.setParameter(SpeechConstant.PARAMS, null);
         mVerify.setParameter(SpeechConstant.ISV_AUDIO_PATH,
                 Environment.getExternalStorageDirectory().getAbsolutePath() + "/msc/test.pcm");
